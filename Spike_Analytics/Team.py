@@ -1,4 +1,4 @@
-from player import Player
+from Spike_Analytics.player import Player
 
 
 class Team:
