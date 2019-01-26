@@ -13,6 +13,7 @@ class Player {
     secondServePercentage: number = 0;
     numberOfBreaksOnServe:number = 0;
     numberOfTimesAced: number = 0;
+    numberOfBreaksWhenReturning: number = 0;
     dTOn1stServe: number = 0;
     dTon2ndServe: number = 0;
     numberOfDefensiveTouches: number = 0;
@@ -456,6 +457,7 @@ export let ace = (): void => {
         isServing.sace();
     }
     isReturning.numberOfTimesAced += 1;
+    isReturning.numberOfBreaksWhenReturning += 1;
     pointWinner = teamServing;
 };
 
@@ -494,6 +496,7 @@ export let kill = (): void => {
     attackingPlayer.kills += 1;
     if (teamAttacking === teamServing) {
         isServing.numberOfBreaksOnServe += 1;
+        isReturning.numberOfBreaksWhenReturning += 1;
     }
     pointWinner = teamAttacking;
     ballInPlay = false;
@@ -503,6 +506,7 @@ export let kill = (): void => {
 export let missedHit = (): void => {
     if (teamDefeding === teamServing) {
         isServing.numberOfBreaksOnServe += 1;
+        isReturning.numberOfBreaksWhenReturning += 1;
     }
     pointWinner = teamDefeding;
     ballInPlay = false;
@@ -544,13 +548,15 @@ export let swapAttacker = (rp: Player): Player => {
     } else if (defendingPlayer === teamDefeding.player2) {
         return teamDefeding.player1;
     } else {
-        print("Fix swap attacker");
         return teamAttacking.player1;
     }
 };
 
 export let notReturned = ():void => {
-    if (teamAttacking !== teamServing) {isServing.numberOfBreaksOnServe += 1; }
+    if (teamAttacking !== teamServing) {
+        isServing.numberOfBreaksOnServe += 1;
+        isReturning.numberOfBreaksWhenReturning += 1;
+    }
     pointWinner = teamDefeding;
     ballInPlay = false;
 };
