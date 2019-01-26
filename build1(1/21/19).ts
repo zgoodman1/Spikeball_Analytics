@@ -131,7 +131,6 @@ if (whoIsServing === 1) {
     returningOrder =  [player4, player2, player3, player1];
     }
 }
-
 isReturning = returningOrder[0];
 isServing = servingOrder[0];
 let intialServer = isServing;
@@ -163,49 +162,29 @@ while (isServing === intialServer && team1.score < gameTo) {
             if (returnResult === "D1") {
                 downOn1();
                 let hitResult = await promptString("K, M, DT?");
-                if (hitResult === "K") {
-                    kill();
-                } else if (hitResult === "M") {
-                    missedHit();
-                } else {
-                    defensiveTouch();
-                    let whoDT = await promptNumber(teamAttacking.name + " Player 1 or 2?");
-                    if (whoDT === 1) {
-                        player1DT();
-                    } else {
-                        player2DT();
-                    }
-                }
+                if (hitResult === "K") {kill(); } else 
+                if (hitResult === "M") {missedHit(); } else  
+                if (hitResult === "DT1" || "1" || teamDefeding.player1.denotation) {  player1DT();
+                    } else {player2DT(); }
             } else if (returnResult === "D2") {
                 downOn2();
                 let hitResult = await promptString("K, M, DT?");
                 if (hitResult === "K") {kill(); } else 
                 if (hitResult === "M") {missedHit(); } else {
-                defensiveTouch();
-                let whoDT = await promptNumber(teamAttacking.name + " Player 1 or 2?");
-                if (whoDT === 1) {
-                    player1DT();
-                } else {
-                    player2DT();
-                }
-                } 
+                    if (hitResult === "DT1" || "1" || teamDefeding.player1.denotation) {  player1DT();
+                    } else {player2DT(); }
+                        } 
             } else if (returnResult === "D3") {
                 downOn3();
-                let hitResult = await promptString("K, M, DT?");
+                let hitResult = await promptString("K, M, DT1 0r DT2 ?");
                 if (hitResult === "K") {kill(); } else 
                 if (hitResult === "M") {missedHit(); } else {
-                defensiveTouch();
-                let whoDT = await promptNumber(teamAttacking.name + " Player 1 or 2?");
-                if (whoDT === 1) {
-                    player1DT();
+                if (hitResult === "DT1" || "1" || teamDefeding.player1.denotation) {  player1DT();
                 } else {
                     player2DT();
                 }
                 } 
-            } else {
-                notReturned();
-            }
-            
+            } else { notReturned(); }
         }
 
     }
@@ -259,49 +238,29 @@ while ((team1.score < gameTo && team2.score < gameTo) || ((team1.score - team2.s
             if (returnResult === "D1") {
                 downOn1();
                 let hitResult = await promptString("K, M, DT?");
-                if (hitResult === "K") {
-                    kill();
-                } else if (hitResult === "M") {
-                    missedHit();
-                } else {
-                    defensiveTouch();
-                    let whoDT = await promptNumber(teamAttacking.name + " Player 1 or 2?");
-                    if (whoDT === 1) {
-                        player1DT();
-                    } else {
-                        player2DT();
-                    }
-                }
+                if (hitResult === "K") {kill(); } else 
+                if (hitResult === "M") {missedHit(); } else  
+                if (hitResult === "DT1" || "1" || teamDefeding.player1.denotation) {  player1DT();
+                    } else {player2DT(); }
             } else if (returnResult === "D2") {
                 downOn2();
                 let hitResult = await promptString("K, M, DT?");
                 if (hitResult === "K") {kill(); } else 
                 if (hitResult === "M") {missedHit(); } else {
-                defensiveTouch();
-                let whoDT = await promptNumber(teamAttacking.name + " Player 1 or 2?");
-                if (whoDT === 1) {
-                    player1DT();
-                } else {
-                    player2DT();
-                }
-                } 
+                    if (hitResult === "DT1" || "1" || teamDefeding.player1.denotation) {  player1DT();
+                    } else {player2DT(); }
+                        } 
             } else if (returnResult === "D3") {
                 downOn3();
-                let hitResult = await promptString("K, M, DT?");
+                let hitResult = await promptString("K, M, DT1 0r DT2 ?");
                 if (hitResult === "K") {kill(); } else 
                 if (hitResult === "M") {missedHit(); } else {
-                defensiveTouch();
-                let whoDT = await promptNumber(teamAttacking.name + " Player 1 or 2?");
-                if (whoDT === 1) {
-                    player1DT();
+                if (hitResult === "DT1" || "1" || teamDefeding.player1.denotation) {  player1DT();
                 } else {
                     player2DT();
                 }
                 } 
-            } else {
-                notReturned();
-            }
-            
+            } else { notReturned(); }
         }
 
     }
@@ -413,11 +372,6 @@ export let swapServer = (sO: Player[]): Player => {
     }
     return sO[0];
 };
-// Cleaner than repeating over and over
-// export let printPointOver = (): void => {
-//     print ("Team 1 " + team1.score + " Team 2 " + team2.score);
-//     print ("Serving: " + isServing.denotation + " Returing:" + isReturning. denotation);
-// }
 // Called on pocket serve
 export let pocket = ():void => {
     if (serve === 1) {
@@ -497,16 +451,13 @@ export let missedHit = (): void => {
     pointWinner = teamDefeding;
     ballInPlay = false;
 };
-
-export let defensiveTouch = (): void => {
+export let player1DT = ():void => {
     attackingPlayer.hitsOn += 1;
     numberOfShotsIP += 1;
     let temp: Team;
     temp = teamAttacking;
     teamAttacking = teamDefeding;
     teamDefeding = temp;
-};
-export let player1DT = ():void => {
     defendingPlayer = teamAttacking.player1;
     defendingPlayer.numberOfDefensiveTouches += 1;
     if (serve === 1 && teamAttacking === teamServing && numberOfShotsIP === 1) {
@@ -518,6 +469,12 @@ export let player1DT = ():void => {
 };
 
 export let player2DT = ():void => {
+    attackingPlayer.hitsOn += 1;
+    numberOfShotsIP += 1;
+    let temp: Team;
+    temp = teamAttacking;
+    teamAttacking = teamDefeding;
+    teamDefeding = temp;
     defendingPlayer = teamAttacking.player2;
     defendingPlayer.numberOfDefensiveTouches += 1;
     if (serve === 1 && teamAttacking === teamServing && numberOfShotsIP === 1) {
@@ -551,7 +508,7 @@ export let getNumberOfAces = (data: Player[]): number => {
     let result = 0;
     for (let i = 0; i < 4; i++) {
        result += data[i].numberofAces;
+       result += data[i].secondServeAces;
     }
     return result;
 };
-
