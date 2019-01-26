@@ -114,21 +114,28 @@ let gameTo = await promptNumber("Game to?");
 
 let whoIsServing = await promptNumber("Who is serving? Player 1 or 2");
 if (whoIsServing === 1) {
-    // isServing = player1;
-    servingOrder = [player1, player3, player2, player4];
-} else {
-    // isServing = player2;
-    servingOrder = [player2, player3, player1, player4];
-}
-let whoIsReturning = await promptNumber("who is returning? player 3 or 4");
-if (whoIsReturning === 3) {
-    // isReturning = player3;
-    returningOrder = [player3, player1, player4, player2];
-} else {
-    // isReturning = player4;
-    returningOrder =  [player4, player1, player3, player2];
 
+    servingOrder = [player1, player3, player2, player4];
+    let whoIsReturning = await promptNumber("who is returning? player 3 or 4");
+    if (whoIsReturning === 3) {
+    returningOrder = [player3, player1, player4, player2];
+}   else {
+    returningOrder =  [player4, player1, player3, player2];
+    }
+} else {
+    servingOrder = [player2, player3, player1, player4];
+    let whoIsReturning = await promptNumber("who is returning? player 3 or 4");
+    if (whoIsReturning === 3) {
+    returningOrder = [player3, player2, player4, player1];
+}   else {
+    returningOrder =  [player4, player2, player3, player1];
+    }
 }
+
+// let whoIsServingSecond = await promptNumber("who is serving first for team 2, 3 or 4?");
+// if (whoIsServingSecond === 3) {
+
+// }
 isReturning = returningOrder[0];
 isServing = servingOrder[0];
 let intialServer = isServing;
@@ -221,23 +228,13 @@ while (isServing === intialServer && team1.score < gameTo) {
             establishServingOrder(servingOrder);
             isServing = swapServer(servingOrder);
         }
-        for (let i = 0; i < 4; i++) {
-            print(returningOrder[i].denotation);
-        }
         if (isServing === isReturning) {
             isReturning = swapReturner(returningOrder);
             
         } else if (whoIsServing === 3) { 
-            establishReturningOrder(returningOrder);
-            print("spot 1");
-            for (let i = 0; i < 4; i++) {
-                print(returningOrder[i].denotation);
-            }
             isReturning = swapReturner(returningOrder);
-            print("spot 2");
-            for (let i = 0; i < 4; i++) {
-                print(returningOrder[i].denotation);
-            }
+        } else {
+            isReturning = swapReturner(returningOrder);
         }
         print (team1.name + " " + team1.score + " " + team2.name + " " + team2.score);
         print ("Serving: " + isServing.denotation + " Returning:" + isReturning. denotation);
