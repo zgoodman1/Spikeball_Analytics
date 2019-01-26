@@ -132,10 +132,6 @@ if (whoIsServing === 1) {
     }
 }
 
-// let whoIsServingSecond = await promptNumber("who is serving first for team 2, 3 or 4?");
-// if (whoIsServingSecond === 3) {
-
-// }
 isReturning = returningOrder[0];
 isServing = servingOrder[0];
 let intialServer = isServing;
@@ -228,14 +224,7 @@ while (isServing === intialServer && team1.score < gameTo) {
             establishServingOrder(servingOrder);
             isServing = swapServer(servingOrder);
         }
-        if (isServing === isReturning) {
-            isReturning = swapReturner(returningOrder);
-            
-        } else if (whoIsServing === 3) { 
-            isReturning = swapReturner(returningOrder);
-        } else {
-            isReturning = swapReturner(returningOrder);
-        }
+        isReturning = swapReturner(returningOrder);
         print (team1.name + " " + team1.score + " " + team2.name + " " + team2.score);
         print ("Serving: " + isServing.denotation + " Returning:" + isReturning. denotation);
         teamServing = swapServingTeam(teamServingOrder);
