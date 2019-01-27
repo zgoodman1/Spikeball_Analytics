@@ -1,0 +1,9 @@
+{% extends "spike_stats/base.html" %}
+{% block content %}
+    {% for game in games %}
+        <h1>{{ game.game }}</h1>
+        <p>Played by {{ game.players }} on
+            {{ game.date_played}}</p>
+        <p>{{ game.stats }}</p>
+    {% endfor %}
+{% endblock content %}
