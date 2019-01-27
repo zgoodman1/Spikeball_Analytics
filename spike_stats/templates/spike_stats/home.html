@@ -1,9 +1,15 @@
 {% extends "spike_stats/base.html" %}
 {% block content %}
     {% for game in games %}
-        <h1>{{ game.game }}</h1>
-        <p>Played by {{ game.players }} on
-            {{ game.date_played}}</p>
-        <p>{{ game.stats }}</p>
+		<article class="media content-section">
+		  <div class="media-body">
+		    <div class="article-metadata">
+		      <a class="mr-2" href="#">{{ game.players }}</a>
+		      <small class="text-muted">{{ game.date_played }}</small>
+		    </div>
+		    <h2><a class="article-title" href="#">{{ game.game }}</a></h2>
+		    <p class="article-content">{{ game.stats }}</p>
+		  </div>
+		</article>
     {% endfor %}
 {% endblock content %}
