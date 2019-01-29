@@ -18,13 +18,14 @@ class Player:
             pockets = 0
 
         total_aces = FirstServe.aces + SecondServe.aces
-        num_breaks = 0
+        num_breaks_on_serve = 0
         hits_on = 0
+        down_on1 = 0
+        down_on2 = 0
         hits_total = 0
         kills = 0
         hit_percentage = 0
         kill_percentage = 0
-        num_break_w_returning = 0
 
     class Defense:
         aced = 0
@@ -33,6 +34,7 @@ class Player:
         t_on_second = 0
         def_ts = 0
         def_t_no_return = 0
+        num_break_w_returning = 0
 
     def __init__(self, n):
         self.name = n
