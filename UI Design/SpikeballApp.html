@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel="stylesheet" type="text/css" href="SpikeballApp.css">
+  </head>
+  <div id="app">
+  <h1> Spikeball Stat Tracker </h1>
+    <div id="q0" v-if = "currentPage == 'q0'">
+      <h3> Team 1 </h3>
+      <p>Player 1: <input id="p1name" v-model="topPlayer" style = "text-align:center"></input> </p>
+      <p>Player 2: <input id="p2name" v-model="leftPlayer" style = "text-align:center"></input></p>
+
+      <h3> Team 2 </h3>
+      <p>Player 3: <input id="p3name" v-model="rightPlayer" style = "text-align:center"></input> </p>
+      <p>Player 4: <input id="p4name" v-model="bottomPlayer" style = "text-align:center"></input></p>
+      <br></br>
+      <button v-on:click = "nextPage"> Continue </button>
+    </div>
+
+    <div id="q1" v-if = "currentPage == 'q1'">
+      <h2> Who served first? </h2>
+      <button v-on:click = "chooseServer(player1)"> {{player1}}</button>
+      <button v-on:click = "chooseServer(player2)"> {{player2}}</button>
+      <button v-on:click = "chooseServer(player3)"> {{player3}} </button>
+      <button v-on:click = "chooseServer(player4)"> {{player4}} </button>
+    </div>
+
+    <div id="q2" v-if = "currentPage == 'q2'">
+      <h2> Who served second? </h2>
+      <button v-if = "firstServer != player1 && firstServer != player2" v-on:click = "chooseServer(player1)"> {{player1}} </button>
+      <button v-if = "firstServer != player1 && firstServer != player2" v-on:click = "chooseServer(player2)"> {{player2}} </button>
+      <button v-if = "firstServer != player3 && firstServer != player4" v-on:click = "chooseServer(player3)"> {{player3}}</button>
+      <button v-if = "firstServer != player3 && firstServer != player4" v-on:click = "chooseServer(player4)"> {{player4}}</button>
+
+    </div>
+
+    <div id="point1" v-if = "currentPage == 'inGame'">
+      <div id = "serve" v-if = "currentAction == 'serve'">
+        <h2> {{currentServer}}'s Serve! What Happened? </h2>
+        <button v-on:click = "serveResult('rim')"> Rim </button>
+        <button v-on:click = "serveResult('inPlay')"> In Play </button>
+        <button v-on:click = "serveResult('ace')"> Ace </button>
+      </div>
+
+      <div id = "1st possession" v-if = "currentAction == 'poss1'">
+        <h2> {{currentPossession}} Possession! What happened? </h2>
+        <button v-on:click = "playResult('rim')"> Rim/Not Back to Net </button>
+        <button v-on:click = "playResult('kill')"> Kill Shot </button>
+        <button v-on:click = "playResult('dtouch')"> Defensive Touch </button>
+      </div>
+
+    </div>
+
+    <div id="endGame" v-if = "currentPage == 'endGame'">
+      <h2>{{winningTeam}} Won!</h2>
+      <button> Final Stats </button>
+    </div>
+
+    <div id = "currentStats" disabled>
+      <br></br>
+      <h2> Score </h2>
+      <h3> Team 1: {{currentScore[0].score}}</h3>
+      <h3> Team 2: {{currentScore[1].score}}</h3>
+      <br></br>
+      <h2> Current Stats </h2>
+      <table id = "statsTable">
+        <tr>
+          <th> Player Name </th>
+          <th> Serve% </th>
+          <th> Ace% </th>
+          <!--<th> Kill% </th>
+              <th> DTouch%</th>
+              <th> SReturn%</th>
+              <th> </th>-->
+        </tr>
+        <tr>
+          <td v-for = "stat in p1Stats">{{stat.value}}</td>
+        </tr>
+        <tr>
+          <td v-for = "stat in p2Stats">{{stat.value}}</td>
+        </tr>
+        <tr>
+          <td v-for = "stat in p3Stats">{{stat.value}}</td>
+        </tr>
+        <tr>
+          <td v-for = "stat in p4Stats">{{stat.value}}</td>
+        </tr>
+      </table>
+    </div>
+
+    <br></br>
+
+    <div class="row" id = "row1">
+      <div class="column" style="background-color:#aaa;">
+      </div>
+      <div class="column" style="background-color:#aaa;">
+        <p class="imgPlayer"> {{topPlayer}} </p>
+      </div>
+      <div class="column" style="background-color:#aaa;">
+      </div>
+    </div>
+    <div class="row" id = "row2">
+      <div class="column" style="background-color:#aaa;">
+        <p class="imgPlayer"> {{leftPlayer}} </p>
+      </div>
+      <div class="column" style="background-color:#aaa;">
+        <img src="circle.png" alt="Circle" height="100px" width="100px">
+      </div>
+      <div class="column" style="background-color:#aaa;">
+        <p class="imgPlayer"> {{rightPlayer}} </p>
+      </div>
+    </div>
+    <div class="row" id = "row3">
+      <div class="column" style="background-color:#aaa;">
+      </div>
+      <div class="column" style="background-color:#aaa;">
+        <p class="imgPlayer"> {{bottomPlayer}} </p>
+      </div>
+      <div class="column" style="background-color:#aaa;">
+      </div>
+    </div>
+
+  </div>
+</html>
+
+
+<script>
+var app = new Vue({
+  el: '#app',
+  data: {
+    player1: 'Player 1',
+    player2: 'Player 2',
+    player3: 'Player 3',
+    player4: 'Player 4',
+    topPlayer: 'Player 1',
+    leftPlayer: 'Player 2',
+    rightPlayer: 'Player 3',
+    bottomPlayer: 'Player 4',
+    next: false,
+    currentScore: [
+      {id: 'team 1', score: 0},
+      {id: 'team 2', score: 0}
+    ],
+    currentPage: 'q0',
+    currentAction: '',
+    possessionNumber: 0,
+    currentPossession: '',
+    serveCounter: 0,
+    currentServer: '',
+    currentReturner: '',
+    currentServeTeam: 0,
+    firstServer: '',
+    secondServer: '',
+    winningTeam: '',
+    serveReturnPairs: [
+      {ret: 'p4'},
+      {ret: 'p3'},
+      {ret: 'p2'},
+      {ret: 'p1'},
+    ],
+    serveOrder: [
+      {id: 1, text: ''},
+      {id: 2, text: ''},
+      {id: 3, text: ''},
+      {id: 4, text: ''}
+    ],
+
+    p1Stats: [
+      {id: "name", value: ''},
+      {id: "serve%", value: 0},
+      {id: "ace%", value: 0}
+      //{id: "kill%", value: 0}
+    ],
+    p1HiddenStats: [
+      {id:'totalServes', value: 0},
+      {id:'totalMadeServes', value: 0},
+      {id:'totalAces', value: 0}
+    ],
+    p2Stats: [
+      {id: "name", value: ''},
+      {id: "serve%", value: 0},
+      {id: "ace%", value: 0}
+      //{id: "kill%", value: 0}
+    ],
+    p2HiddenStats: [
+      {id:'totalServes', value: 0},
+      {id:'totalMadeServes', value: 0},
+      {id:'totalAces', value: 0}
+    ],
+    p3Stats: [
+      {id: "name", value: ''},
+      {id: "serve%", value: 0},
+      {id: "ace%", value: 0}
+      //{id: "kill%", value: 0}
+    ],
+    p3HiddenStats: [
+      {id:'totalServes', value: 0},
+      {id:'totalMadeServes', value: 0},
+      {id:'totalAces', value: 0}
+    ],
+    p4Stats: [
+      {id: "name", value: ''},
+      {id: "serve%", value: 0},
+      {id: "ace%", value: 0}
+      //{id: "kill%", value: 0}
+    ],
+    p4HiddenStats: [
+      {id:'totalServes', value: 0},
+      {id:'totalMadeServes', value: 0},
+      {id:'totalAces', value: 0}
+    ],
+  },
+
+  methods: {
+    nextPage: function(){
+      var pageNum = this.currentPage.charAt(1);
+      pageNum = Number(parseInt(pageNum, 10) + 1);
+      this.currentPage = "q" + pageNum;
+      //this.next = false;
+      if(this.currentPage == "q1"){
+        this.player1 = this.topPlayer;
+        this.player2 = this.leftPlayer;
+        this.player3 = this.rightPlayer;
+        this.player4 = this.bottomPlayer;
+
+        this.p1Stats[0].value = this.player1;
+        this.p2Stats[0].value = this.player2;
+        this.p3Stats[0].value = this.player3;
+        this.p4Stats[0].value = this.player4;
+        document.getElementById("currentStats").style.display="block";
+      }
+      console.log(this.currentPage);
+    },
+    /*disable: function(player){
+      document.getElementById(player).disabled=true;
+
+      if(document.getElementById("p1name").disabled==true && document.getElementById("p2name").disabled==true && document.getElementById("p3name").disabled==true && document.getElementById("p4name").disabled == true){
+        app.next = true;
+        this.topPlayer = this.player1;
+        this.leftPlayer = this.player2;
+        this.rightPlayer = this.player3;
+        this.bottomPlayer = this.player4;
+        console.log("made it here");
+      }
+      console.log("it ran again");
+    },*/
+    chooseServer: function(player){
+      if(this.currentPage == "q1"){
+        if(player == this.player1){
+          this.serveOrder[0].text = this.player1;
+          this.serveOrder[2].text = this.player2;
+          this.currentPossession = 'Team 1';
+        }
+        if(player == this.player2){
+          this.serveOrder[0].text = this.player2;
+          this.serveOrder[2].text = this.player1;
+          this.currentPossession = 'Team 1';
+        }
+        if(player == this.player3){
+          this.serveOrder[0].text = this.player3;
+          this.serveOrder[2].text = this.player4;
+          this.currentPosession = 'Team 2';
+        }
+        if(player == this.player4){
+          this.serveOrder[0].text = this.player4;
+          this.serveOrder[2].text = this.player3;
+          this.currentPosession = 'Team 2';
+        }
+        this.firstServer = player;
+
+        this. nextPage();
+        return;
+      }
+      if(this.currentPage == "q2"){
+        if(player == this.player1){
+          this.serveOrder[1].text = this.player1;
+          this.serveOrder[3].text = this.player2;
+        }
+        if(player == this.player2){
+          this.serveOrder[1].text = this.player2;
+          this.serveOrder[3].text = this.player1;
+        }
+        if(player == this.player3){
+          this.serveOrder[1].text = this.player3;
+          this.serveOrder[3].text = this.player4;
+        }
+        if(player == this.player4){
+          this.serveOrder[1].text = this.player4;
+          this.serveOrder[3].text = this.player3;
+        }
+        this.secondServer = player;
+        console.log(this.serveOrder[0].text + this.serveOrder[1].text + this.serveOrder[2].text + this.serveOrder[3].text)
+        this.currentPage = "inGame";
+        this.serveCounter = 1;
+        this.currentServer = this.firstServer;
+        this.currentAction = "serve";
+        return;
+      }
+    },
+    serveResult: function(result){
+      if(this.serveCounter % 4 == 1 || this.serveCounter % 4 == 3){
+        this.currentServeTeam = 1;
+      }
+      else{
+        this.currentServeTeam = 2;
+      }
+
+      if(result == 'ace'){
+        if(this.currentServeTeam == 1){
+          this.currentScore[0].score += 1;
+        }
+        else{
+          this.currentScore[1].score += 1;
+        }
+        this.changeServeStats(this.currentServer, result);
+        this.switchWithPartner(this.currentServer);
+        var team1Score = this.currentScore[0].score;
+        var team2Score = this.currentScore[1].score;
+        console.log(team2Score);
+        if((team1Score + team2Score) % 5 == 0 || (team1Score >= 21 && team1Score-team2Score >= 2) || (team2Score >= 21 && team2Score-team1Score >=2)){
+          console.log(team1Score + team2Score);
+          this.changeGameState(team1Score,team2Score);
+        }
+      }
+
+      if(result == 'rim'){
+        if(this.currentServeTeam == 1){
+          this.currentScore[1].score += 1;
+        }
+        else{
+          this.currentScore[0].score += 1;
+        }
+        this.changeServeStats(this.currentServer, result);
+        var team1Score = this.currentScore[0].score;
+        var team2Score = this.currentScore[1].score;
+        console.log(team1Score + team2Score);
+        if((team1Score + team2Score) % 5 == 0 || (team1Score >= 21 && team1Score-team2Score >= 2) || (team2Score >= 21 && team1Score-team2Score >=2)){
+          this.changeGameState(team1Score,team2Score);
+        }
+        this.serveCounter += 1;
+        this.currentServer = this.serveOrder[(this.serveCounter-1) % 4].text;
+
+      }
+      if(result == 'inPlay'){
+        this.changeServeStats(this.currentServer, result);
+        this.currentAction = 'poss1';
+        posessionNumber = 1;
+      }
+    },
+    playResult: function(result){
+      if(result == 'rim'){
+        if(this.currentServeTeam == 1){
+          this.currentScore[0].score += 1;
+        }
+        if(this.currentServeTeam == 2){
+          this.currentScore[1].score += 1;
+        }
+        this.switchWithPartner(this.currentServer);
+        var team1Score = this.currentScore[0].score;
+        var team2Score = this.currentScore[1].score;
+
+        if((team1Score + team2Score) % 5 == 0 || (team1Score >= 21 && team1Score-team2Score >= 2) || (team2Score >= 21 && team1Score-team2Score >=2)){
+          console.log(team1Score + team2Score);
+          this.changeGameState(team1Score,team2Score);
+        }
+        this.currentAction = 'serve';
+      }
+      if(result == 'kill'){
+        if(this.currentServeTeam == 1){
+          this.currentScore[1].score += 1;
+        }
+        if(this.currentServeTeam == 2){
+          this.currentScore[0].score += 1;
+        }
+        var team1Score = this.currentScore[0].score;
+        var team2Score = this.currentScore[1].score;
+
+        if((team1Score + team2Score) % 5 == 0 || (team1Score >= 21 && team1Score-team2Score >= 2) || (team2Score >= 21 && team1Score-team2Score >=2)){
+          console.log(team1Score + team2Score);
+          this.changeGameState(team1Score,team2Score);
+        }
+        this.currentAction = 'serve';
+        this.serveCounter += 1;
+        this.currentServer = this.serveOrder[(this.serveCounter-1) % 4].text;
+      }
+
+    },
+    changeGameState: function(team1Score, team2Score){
+      if(team1Score >= 21 && team1Score-team2Score >=2){
+        this.winningTeam = 'Team 1';
+        this.currentAction = 'endGame';
+        this.currentPage = 'endGame';
+        return;
+      }
+      if(team2Score >= 21 && team2Score-team1Score >=2){
+        this.winningTeam = 'Team 2';
+        this.currentAction = 'endGame';
+        this.currentPage = 'endGame';
+      }
+      else{
+        console.log("rotating...");
+        var newTop = this.rightPlayer;
+        this.rightPlayer = this.bottomPlayer;
+        this.bottomPlayer = this.leftPlayer;
+        this.leftPlayer = this.topPlayer;
+        this.topPlayer = newTop;
+      }
+    },
+    switchWithPartner: function(currentServer){
+      if(currentServer == this.player1){
+        if(this.serveReturnPairs[0].ret == this.player4){
+          this.serveReturnPairs[0].ret = this.player3;
+        }
+        else{
+          this.serveReturnPairs[0].ret = this.player4;
+        }
+      }
+      if(currentServer == this.player2){
+        if(this.serveReturnPairs[1].ret == this.player4){
+          this.serveReturnPairs[1].ret = this.player3;
+        }
+        else{
+          this.serveReturnPairs[1].ret = this.player4;
+        }
+      }
+      if(currentServer == this.player3){
+        if(this.serveReturnPairs[2].ret == this.player1){
+          this.serveReturnPairs[2].ret = this.player2;
+        }
+        else{
+          this.serveReturnPairs[2].ret = this.player1;
+        }
+      }
+      if(currentServer == this.player4){
+        if(this.serveReturnPairs[3].ret == this.player1){
+          this.serveReturnPairs[3].ret = this.player2;
+        }
+        else{
+          this.serveReturnPairs[3].ret = this.player1;
+        }
+      }
+      if(this.currentServer == this.player1 || this.currentServer == this.player2){
+        if(this.topPlayer == this.player1 || this.topPlayer == this.player2){
+          if(this.leftPlayer == this.player1 || this.leftPlayer == this.player2){
+            var newTop = this.leftPlayer;
+            this.leftPlayer = this.topPlayer;
+            this.topPlayer = newTop;
+          }
+          if(this.rightPlayer == this.player1 || this.rightPlayer == this.player2){
+            var newTop = this.rightPlayer;
+            this.rightPlayer = this.topPlayer;
+            this.topPlayer = newTop;
+          }
+        }
+        else{
+          if(this.leftPlayer == this.player1 || this.leftPlayer == this.player2){
+            var newBot = this.leftPlayer;
+            this.leftPlayer = this.bottomPlayer;
+            this.bottomPlayer = newBot;
+          }
+          if(this.rightPlayer == this.player1 || this.rightPlayer == this.player2){
+            var newBot = this.rightPlayer;
+            this.rightPlayer = this.bottomPlayer;
+            this.bottomPlayer = newBot;
+          }
+        }
+      }
+      if(this.currentServer == this.player3 || this.currentServer == this.player4){
+        if(this.topPlayer == this.player3 || this.topPlayer == this.player4){
+          if(this.leftPlayer == this.player3 || this.leftPlayer == this.player4){
+            var newTop = this.leftPlayer;
+            this.leftPlayer = this.topPlayer;
+            this.topPlayer = newTop;
+          }
+          if(this.rightPlayer == this.player3 || this.rightPlayer == this.player4){
+            var newTop = this.rightPlayer;
+            this.rightPlayer = this.topPlayer;
+            this.topPlayer = newTop;
+          }
+        }
+        else{
+          if(this.leftPlayer == this.player3 || this.leftPlayer == this.player4){
+            var newBot = this.leftPlayer;
+            this.leftPlayer = this.bottomPlayer;
+            this.bottomPlayer = newBot;
+          }
+          if(this.rightPlayer == this.player3 || this.rightPlayer == this.player4){
+            var newBot = this.rightPlayer;
+            this.rightPlayer = this.bottomPlayer;
+            this.bottomPlayer = newBot;
+          }
+        }
+      }
+    },
+    changeServeStats: function(currentServer, serveResult){
+      //YIKES THIS IS OUT OF HAND
+      if(currentServer == this.player1){
+        this.p1HiddenStats[0].value +=1;
+        if(serveResult != 'rim'/*or pocket*/){
+          this.p1HiddenStats[1].value +=1;
+          if(serveResult == 'ace'){
+            this.p1HiddenStats[2].value +=1;
+          }
+        }
+        this.p1Stats[1].value = (this.p1HiddenStats[1].value/this.p1HiddenStats[0].value).toFixed(2);
+        this.p1Stats[2].value = (this.p1HiddenStats[2].value/this.p1HiddenStats[1].value).toFixed(2);
+      }
+      if(currentServer == this.player2){
+        this.p2HiddenStats[0].value +=1;
+        if(serveResult != 'rim'/*or pocket*/){
+          this.p2HiddenStats[1].value +=1;
+          if(serveResult == 'ace'){
+            this.p2HiddenStats[2].value +=1;
+          }
+        }
+        this.p2Stats[1].value = (this.p2HiddenStats[1].value/this.p2HiddenStats[0].value).toFixed(2);
+        this.p2Stats[2].value = (this.p2HiddenStats[2].value/this.p2HiddenStats[1].value).toFixed(2);
+      }
+      if(currentServer == this.player3){
+        this.p3HiddenStats[0].value +=1;
+        if(serveResult != 'rim'/*or pocket*/){
+          this.p3HiddenStats[1].value +=1;
+          if(serveResult == 'ace'){
+            this.p3HiddenStats[2].value +=1;
+          }
+        }
+        this.p3Stats[1].value = (this.p3HiddenStats[1].value/this.p3HiddenStats[0].value).toFixed(2);
+        this.p3Stats[2].value = (this.p3HiddenStats[2].value/this.p3HiddenStats[1].value).toFixed(2);
+      }
+      if(currentServer == this.player4){
+        this.p4HiddenStats[0].value +=1;
+        if(serveResult != 'rim'/*or pocket*/){
+          this.p4HiddenStats[1].value +=1;
+          if(serveResult == 'ace'){
+            this.p4HiddenStats[2].value +=1;
+          }
+        }
+        this.p4Stats[1].value = (this.p4HiddenStats[1].value/this.p4HiddenStats[0].value).toFixed(2);
+        this.p4Stats[2].value = (this.p4HiddenStats[2].value/this.p4HiddenStats[1].value).toFixed(2);
+      }
+    }
+  }
+})
+
+</script>

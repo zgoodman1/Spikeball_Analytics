@@ -1,0 +1,28 @@
+#currentStats {
+  display: none;
+}
+#statsTable, th, tr{
+  width: 20%;
+  border: 1px solid black;
+  border-collapse: collapse;
+  text-align:center;
+}
+.column {
+  float: left;
+  width: 100px;
+  padding: 10px;
+  height: 100px; /* Should be removed. Only for demonstration */
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.imgPlayer{
+  text-align:center;
+  margin-top: 45px;
+
+}
