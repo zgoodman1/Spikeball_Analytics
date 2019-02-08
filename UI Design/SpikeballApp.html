@@ -4,124 +4,159 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <link rel="stylesheet" type="text/css" href="SpikeballApp.css">
   </head>
-  <div id="app">
-  <h1> Spikeball Stat Tracker </h1>
-    <div id="q0" v-if = "currentPage == 'q0'">
-      <h3> Team 1 </h3>
-      <p>Player 1: <input id="p1name" v-model="topPlayer" style = "text-align:center"></input> </p>
-      <p>Player 2: <input id="p2name" v-model="leftPlayer" style = "text-align:center"></input></p>
+  <body>
+    <div id="app">
+      <h1> Spikeball Stat Tracker </h1>
+      <div id="q0" v-if = "currentPage == 'q0'">
+        <div class="teamInputDiv" id="inDiv1">
 
-      <h3> Team 2 </h3>
-      <p>Player 3: <input id="p3name" v-model="rightPlayer" style = "text-align:center"></input> </p>
-      <p>Player 4: <input id="p4name" v-model="bottomPlayer" style = "text-align:center"></input></p>
-      <br></br>
-      <button v-on:click = "nextPage"> Continue </button>
+          <h3> Team 1 </h3>
+          <p>Player 1: <input id="p1name" v-model="topPlayer" style = "text-align:center"></input> </p>
+          <p>Player 2: <input id="p2name" v-model="leftPlayer" style = "text-align:center"></input></p>
+        </div>
+        <div class = "teamInputDiv" id="inDiv2">
+          <h3> Team 2 </h3>
+          <p>Player 3: <input id="p3name" v-model="rightPlayer" style = "text-align:center"></input> </p>
+          <p>Player 4: <input id="p4name" v-model="bottomPlayer" style = "text-align:center"></input></p>
+        </div>
+          <div v-on:click = "nextPage" id="continueButton">Continue</div>
+      </div>
+      <div id="leftSide" v-if = "showColumns">
+        <div id="statsPane">
+          <h2> Score </h2>
+          <h3> Team 1: {{currentScore[0].score}}</h3>
+          <h3> Team 2: {{currentScore[1].score}}</h3>
+          <button v-on:click="toggleStats"> {{showOrHide}} Stats </button>
+          <div v-if="showInGameStats" id="inGameStatsPane">
+            <table id = "statsTable">
+              <tr>
+                <th> Player Name </th>
+                <th> Serve% </th>
+                <th> Ace% </th>
+                <!--<th> Kill% </th>
+                    <th> DTouch%</th>
+                    <th> SReturn%</th>
+                    <th> </th>-->
+              </tr>
+              <tr>
+                <td v-for = "stat in p1Stats">{{stat.value}}</td>
+              </tr>
+              <tr>
+                <td v-for = "stat in p2Stats">{{stat.value}}</td>
+              </tr>
+              <tr>
+                <td v-for = "stat in p3Stats">{{stat.value}}</td>
+              </tr>
+              <tr>
+                <td v-for = "stat in p4Stats">{{stat.value}}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <!--<div id="playersGraphic">
+          <div class="row" id = "row1">
+            <div class="column" style="background-color:#aaa;">
+            </div>
+            <div class="column" style="background-color:#aaa;">
+              <p class="imgPlayer"> {{topPlayer}} </p>
+            </div>
+            <div class="column" style="background-color:#aaa;">
+            </div>
+          </div>
+          <div class="row" id = "row2">
+            <div class="column" style="background-color:#aaa;">
+              <p class="imgPlayer"> {{leftPlayer}} </p>
+            </div>
+            <div class="column" style="background-color:#aaa;">
+              <img src="circle.png" alt="Circle" height="100px" width="100px">
+            </div>
+            <div class="column" style="background-color:#aaa;">
+              <p class="imgPlayer"> {{rightPlayer}} </p>
+            </div>
+          </div>
+          <div class="row" id = "row3">
+            <div class="column" style="background-color:#aaa;">
+            </div>
+            <div class="column" style="background-color:#aaa;">
+              <p class="imgPlayer"> {{bottomPlayer}} </p>
+            </div>
+            <div class="column" style="background-color:#aaa;">
+            </div>
+          </div>
+        </div>-->
+      </div>
+      <div id="rightSide" v-if="showColumns"><!--------------------------------------------------Right Side---------------------------------------->
+
+        <div id="q1" v-if = "currentPage == 'q1'" class = "page">
+          <h2> Who served first? </h2>
+          <button v-on:click = "chooseServer(player1)"> {{player1}}</button>
+          <button v-on:click = "chooseServer(player2)"> {{player2}}</button>
+          <button v-on:click = "chooseServer(player3)"> {{player3}} </button>
+          <button v-on:click = "chooseServer(player4)"> {{player4}} </button>
+        </div>
+
+        <div id="q2" v-if = "currentPage == 'q2'" class = "page">
+          <h2> Who served second? </h2>
+          <button v-if = "firstServer != player1 && firstServer != player2" v-on:click = "chooseServer(player1)"> {{player1}} </button>
+          <button v-if = "firstServer != player1 && firstServer != player2" v-on:click = "chooseServer(player2)"> {{player2}} </button>
+          <button v-if = "firstServer != player3 && firstServer != player4" v-on:click = "chooseServer(player3)"> {{player3}}</button>
+          <button v-if = "firstServer != player3 && firstServer != player4" v-on:click = "chooseServer(player4)"> {{player4}}</button>
+
+        </div>
+
+        <div id="point1" v-if = "currentPage == 'inGame'" class = "page">
+          <!------------------------------------------------Start Current Action --------------------------------------------->
+          <div id = "serve" v-if = "currentAction == 'serve'" class="action">
+            <h2> {{currentServer}}'s Serve! What Happened? </h2>
+            <button v-on:click = "serveResult('rim')"> Rim </button>
+            <button v-on:click = "serveResult('inPlay')"> In Play </button>
+            <button v-on:click = "serveResult('ace')"> Ace </button>
+          </div>
+
+          <div id = "1st possession" v-if = "currentAction == 'poss1'" class ="action">
+            <h2> {{currentPossession}} Possession! What happened? </h2>
+            <button v-on:click = "playResult('rim')"> Rim/Not Back to Net </button>
+            <button v-on:click = "playResult('kill')"> Kill Shot </button>
+            <button v-on:click = "playResult('dtouch')"> Defensive Touch </button>
+          </div>
+          <!------------------------------------------------------End Current Action--------------------------------------->
+        </div>
+      </div><!----------------------------------------------------------End Right Side---------------------------------------->
+      <div id="endGame" v-if = "currentPage == 'endGame'">
+        <h2>{{winningTeam}} Won!</h2>
+        <button v-on:click="showEndStats= 'true'"> Final Stats </button>
+      </div>
+      <div id = "currentStats" v-if = "showEndStats">
+        <h2> Score </h2>
+        <h3> Team 1: {{currentScore[0].score}}</h3>
+        <h3> Team 2: {{currentScore[1].score}}</h3>
+        <h2> Player Stats </h2>
+        <table id = "statsTable">
+          <tr>
+            <th> Player Name </th>
+            <th> Serve% </th>
+            <th> Ace% </th>
+            <!--<th> Kill% </th>
+                <th> DTouch%</th>
+                <th> SReturn%</th>
+                <th> </th>-->
+          </tr>
+          <tr>
+            <td v-for = "stat in p1Stats">{{stat.value}}</td>
+          </tr>
+          <tr>
+            <td v-for = "stat in p2Stats">{{stat.value}}</td>
+          </tr>
+          <tr>
+            <td v-for = "stat in p3Stats">{{stat.value}}</td>
+          </tr>
+          <tr>
+            <td v-for = "stat in p4Stats">{{stat.value}}</td>
+          </tr>
+        </table>
+      </div>
     </div>
-
-    <div id="q1" v-if = "currentPage == 'q1'">
-      <h2> Who served first? </h2>
-      <button v-on:click = "chooseServer(player1)"> {{player1}}</button>
-      <button v-on:click = "chooseServer(player2)"> {{player2}}</button>
-      <button v-on:click = "chooseServer(player3)"> {{player3}} </button>
-      <button v-on:click = "chooseServer(player4)"> {{player4}} </button>
-    </div>
-
-    <div id="q2" v-if = "currentPage == 'q2'">
-      <h2> Who served second? </h2>
-      <button v-if = "firstServer != player1 && firstServer != player2" v-on:click = "chooseServer(player1)"> {{player1}} </button>
-      <button v-if = "firstServer != player1 && firstServer != player2" v-on:click = "chooseServer(player2)"> {{player2}} </button>
-      <button v-if = "firstServer != player3 && firstServer != player4" v-on:click = "chooseServer(player3)"> {{player3}}</button>
-      <button v-if = "firstServer != player3 && firstServer != player4" v-on:click = "chooseServer(player4)"> {{player4}}</button>
-
-    </div>
-
-    <div id="point1" v-if = "currentPage == 'inGame'">
-      <div id = "serve" v-if = "currentAction == 'serve'">
-        <h2> {{currentServer}}'s Serve! What Happened? </h2>
-        <button v-on:click = "serveResult('rim')"> Rim </button>
-        <button v-on:click = "serveResult('inPlay')"> In Play </button>
-        <button v-on:click = "serveResult('ace')"> Ace </button>
-      </div>
-
-      <div id = "1st possession" v-if = "currentAction == 'poss1'">
-        <h2> {{currentPossession}} Possession! What happened? </h2>
-        <button v-on:click = "playResult('rim')"> Rim/Not Back to Net </button>
-        <button v-on:click = "playResult('kill')"> Kill Shot </button>
-        <button v-on:click = "playResult('dtouch')"> Defensive Touch </button>
-      </div>
-
-    </div>
-
-    <div id="endGame" v-if = "currentPage == 'endGame'">
-      <h2>{{winningTeam}} Won!</h2>
-      <button> Final Stats </button>
-    </div>
-
-    <div id = "currentStats" disabled>
-      <br></br>
-      <h2> Score </h2>
-      <h3> Team 1: {{currentScore[0].score}}</h3>
-      <h3> Team 2: {{currentScore[1].score}}</h3>
-      <br></br>
-      <h2> Current Stats </h2>
-      <table id = "statsTable">
-        <tr>
-          <th> Player Name </th>
-          <th> Serve% </th>
-          <th> Ace% </th>
-          <!--<th> Kill% </th>
-              <th> DTouch%</th>
-              <th> SReturn%</th>
-              <th> </th>-->
-        </tr>
-        <tr>
-          <td v-for = "stat in p1Stats">{{stat.value}}</td>
-        </tr>
-        <tr>
-          <td v-for = "stat in p2Stats">{{stat.value}}</td>
-        </tr>
-        <tr>
-          <td v-for = "stat in p3Stats">{{stat.value}}</td>
-        </tr>
-        <tr>
-          <td v-for = "stat in p4Stats">{{stat.value}}</td>
-        </tr>
-      </table>
-    </div>
-
-    <br></br>
-
-    <div class="row" id = "row1">
-      <div class="column" style="background-color:#aaa;">
-      </div>
-      <div class="column" style="background-color:#aaa;">
-        <p class="imgPlayer"> {{topPlayer}} </p>
-      </div>
-      <div class="column" style="background-color:#aaa;">
-      </div>
-    </div>
-    <div class="row" id = "row2">
-      <div class="column" style="background-color:#aaa;">
-        <p class="imgPlayer"> {{leftPlayer}} </p>
-      </div>
-      <div class="column" style="background-color:#aaa;">
-        <img src="circle.png" alt="Circle" height="100px" width="100px">
-      </div>
-      <div class="column" style="background-color:#aaa;">
-        <p class="imgPlayer"> {{rightPlayer}} </p>
-      </div>
-    </div>
-    <div class="row" id = "row3">
-      <div class="column" style="background-color:#aaa;">
-      </div>
-      <div class="column" style="background-color:#aaa;">
-        <p class="imgPlayer"> {{bottomPlayer}} </p>
-      </div>
-      <div class="column" style="background-color:#aaa;">
-      </div>
-    </div>
-
-  </div>
+  </body>
 </html>
 
 
@@ -129,6 +164,10 @@
 var app = new Vue({
   el: '#app',
   data: {
+    showColumns: false,
+    showInGameStats:false,
+    showOrHide:'Show',
+    showEndStats: false,
     player1: 'Player 1',
     player2: 'Player 2',
     player3: 'Player 3',
@@ -217,6 +256,8 @@ var app = new Vue({
       var pageNum = this.currentPage.charAt(1);
       pageNum = Number(parseInt(pageNum, 10) + 1);
       this.currentPage = "q" + pageNum;
+      this.showColumns = true;
+      //document.getElementById("q0").style.display="none";
       //this.next = false;
       if(this.currentPage == "q1"){
         this.player1 = this.topPlayer;
@@ -228,7 +269,7 @@ var app = new Vue({
         this.p2Stats[0].value = this.player2;
         this.p3Stats[0].value = this.player3;
         this.p4Stats[0].value = this.player4;
-        document.getElementById("currentStats").style.display="block";
+        //document.getElementById("currentStats").style.display="block";
       }
       console.log(this.currentPage);
     },
@@ -245,6 +286,16 @@ var app = new Vue({
       }
       console.log("it ran again");
     },*/
+    toggleStats: function(){
+      if(this.showInGameStats == true){
+        this.showInGameStats = false
+        this.showOrHide = 'Show';
+      }
+      else{
+        this.showInGameStats = true;
+        this.showOrHide='Hide';
+      }
+    },
     chooseServer: function(player){
       if(this.currentPage == "q1"){
         if(player == this.player1){
@@ -391,12 +442,14 @@ var app = new Vue({
         this.winningTeam = 'Team 1';
         this.currentAction = 'endGame';
         this.currentPage = 'endGame';
+        this.showColumns = false;
         return;
       }
       if(team2Score >= 21 && team2Score-team1Score >=2){
         this.winningTeam = 'Team 2';
         this.currentAction = 'endGame';
         this.currentPage = 'endGame';
+        this.showColumns = false;
       }
       else{
         console.log("rotating...");

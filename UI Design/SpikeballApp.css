@@ -1,28 +1,108 @@
 #currentStats {
-  display: none;
+  text-align:center;
 }
+#statsTable{
+  margin:auto;
+  align-self:center;
+}
+#inGameStatsPane{
+  padding-top:5%;
+}
+
 #statsTable, th, tr{
   width: 20%;
   border: 1px solid black;
   border-collapse: collapse;
   text-align:center;
 }
-.column {
-  float: left;
-  width: 100px;
-  padding: 10px;
-  height: 100px; /* Should be removed. Only for demonstration */
-}
+/*.column {
+   float:left;
+   width:100px;
+   height:100px;
+}*/
 
 /* Clear floats after the columns */
-.row:after {
+/*.row:after {
   content: "";
   display: table;
   clear: both;
+}*/
+
+/*.imgPlayer{
+  text-align:center;
+  margin:auto;
+
+}*/
+.page{
+  margin:auto;
+  width:90%;
+  padding-top:15%;
+  padding-bottom:15%;
+  background-color:white;
+  border-color:black;
+  border-style: solid;
+  border-radius:10px;
+
+}
+#statsPane{
+  background-color:white;
+  border-color:black;
+  border-style: solid;
+  text-align:center;
+  padding-bottom:3.5%;
+  height:auto;
+}
+body{
+  background-color:yellow;
+}
+.teamInputDiv{
+  display:inline-block;
+  width: 28.7%;
+  padding-bottom:1%;
+  text-align: center;
+  color:white;
+  border-radius:5px;
+  background-color:black;
+}
+#inDiv1{
+  margin-left:20%;
+  margin-right: 1%;
+  margin-bottom: 2%;
+}
+#inDiv2{
+  margin-right:20%;
+  margin-left:1%;
+  margin-bottom: 2%;
+}
+h1{
+  text-align: center;
+}
+#continueButton{
+  width:10%;
+  height:5%;
+  padding-bottom: 1%;
+  padding-top: 1%;
+  background-color:black;
+  text-align: center;
+  color:white;
+  align-self: center;
+  margin:0 auto;
+  vertical-align: middle;
+  border-color:white;
+  border-style:solid;
 }
 
-.imgPlayer{
-  text-align:center;
-  margin-top: 45px;
+#leftSide{
+  display:inline-block;
+  width:40%;
+}
 
+#rightSide{
+  display:inline-block;
+  width:59%;
+  text-align: center;
+}
+
+#endGame{
+  text-align: center;
 }
