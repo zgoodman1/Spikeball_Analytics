@@ -1,19 +1,5 @@
 from django.shortcuts import render
-
-games = [
-    {
-        'players': 'Jake, Zach, Hayden and Trey',
-        'game': 'Game 1',
-        'stats': 'Stats:',
-        'date_played': 'January 27, 2019'
-    },
-    {
-        'players': 'Jake, Zach, Hayden and Trey',
-        'game': 'Game 2',
-        'stats': 'Stats:',
-        'date_played': 'January 28, 2019'
-    }
-]
+from .models import Game
 
 
 def home(request):
@@ -21,7 +7,7 @@ def home(request):
     # game info in games dictionary above, then displays
     # it on the home page
     context = {
-        'games': games
+        'games': Game.objects.all()
     }
     return render(request, 'spike_stats/home.html', context)
 

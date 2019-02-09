@@ -4,11 +4,12 @@
 		<article class="media content-section">
 		  <div class="media-body">
 		    <div class="article-metadata">
-		      <a class="mr-2" href="#">{{ game.players }}</a>
+		      <a class="mr-2" href="#">{{ game.creator }}</a>
 		      <small class="text-muted">{{ game.date_played }}</small>
 		    </div>
 		    <h2><a class="article-title" href="#">{{ game.game }}</a></h2>
-		    <p class="article-content">{{ game.stats }}</p>
+				<p class="article-content">{{ game.score }}</p>
+				<p class="article-content">{{ game.winner }}</p>
 		  </div>
 		</article>
     {% endfor %}
